@@ -58,4 +58,25 @@ def undistort(mtx, dist, raw_image_paths, outDir = None):
             save_image(write_name,dst)
             if(idx < 2):
                 show_images(img,dst,fname,write_name) #display some samples
+                
+def perspective_transform(img):
+    '''img is undistorted image'''
+    img_size = img.shape[1::-1]
+    src = np.float32([
+        [500,500],
+        [800,500],
+        [1100,680],
+        [220, 650],
+    ])
+    
+    offsetx = 250
+    offsety = 0
+    img_size = (img.shape[1], img.shape[0])
+    dst = np.float32([[offsetx, offsety], [img_size[0]-offsetx, offsety], 
+                                     [img_size[0]-offsetx, img_size[1]-offsety], 
+                                     [offsetx, img_size[1]-offsety]])
+    M = cv2.getPerspectiveTransform(src, dst)
+    M_inv = cv2.getPerspectiveTransform(dst, src) #inverse transform
+    warped = cv2.warpPerspective(img, M, img_size)
+    return warped, M, M_inv
 
