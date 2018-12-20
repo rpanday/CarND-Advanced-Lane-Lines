@@ -17,32 +17,7 @@ def read_image(img_path):
     #return mpimg.imread(img_path) #RGB
     return cv2.imread(img_path) #BGR
 
-def show_before_after(before, after):
-    # Visualize undistortion
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
-    ax1.imshow(before)
-    ax1.set_title('Original Image', fontsize=30)
-    ax2.imshow(after)
-    ax2.set_title('Processed Image', fontsize=30)
-    
 def show_images(img1, img2=None, title1='before', title2='after', fontsize=30):
-    """Display 1 or 2 images
-    
-    Parameters
-    ----------
-    img1 : numpy.ndarray
-        image 1 (BGR format)
-    title1 : str
-        title 1
-    img2 : numpy.ndarray, None
-        image 2 (BGR format)
-    title2 : str, None
-        title 2
-    fontsize : int
-        the font size for the image titles
-    
-    """
-    # Visualize the images
     if img2 is None:
         f, ax1 = plt.subplots(1, 1, figsize=(20,10))
     else:
