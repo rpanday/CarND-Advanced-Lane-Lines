@@ -44,6 +44,7 @@ def find_lane_pixels(binary_warped, nwindows, margin, minpix):
         win_xright_low = rightx_current-margin  # Update this
         win_xright_high = rightx_current+margin  # Update this
         
+        print(win_xleft_low, win_xleft_high, win_xright_low, win_xright_high)
         # Draw the windows on the visualization image
         cv2.rectangle(out_img,(win_xleft_low,win_y_low),
         (win_xleft_high,win_y_high),(0,255,0), 2) 
