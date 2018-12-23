@@ -13,7 +13,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./output_images/undistorted.png "Undistorted"
+[image1]: ./output_images/undistortedchess.png "Undistorted"
 [image2]: ./output_images/undistortion%20on%20frame.png "Road Transformed"
 [image3]: ./output_images/perspective.png "Binary Example"
 [image4]: ./output_images/perspective.png "Warp Example"
