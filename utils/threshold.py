@@ -32,4 +32,24 @@ def s_channel_l_channel_sobelx_threshold(undistorted, s_thresh=(90, 255), sx_thr
     combined_binary[(sxbinary == 1) | (l_binary == 1) & (s_binary == 1)] = 1
     return combined_binary
 
-
+def white_yellow_threshold(img):
+    img = np.copy(img)
+    
+    # Convert to HLS color space and separate the V channel
+    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+    
+    
+    ## White Color
+    lower_white = np.array([0,210,0], dtype=np.uint8)
+    upper_white = np.array([255,255,255], dtype=np.uint8)
+    white_mask = cv2.inRange(hls, lower_white, upper_white)
+    
+    ## Yellow Color
+    lower_yellow = np.array([18,0,100], dtype=np.uint8)
+    upper_yellow = np.array([30,220,255], dtype=np.uint8)
+    yellow_mask = cv2.inRange(hls, lower_yellow, upper_yellow)  
+    
+    combined_binary = np.zeros_like(white_mask)
+    combined_binary[((white_mask == 255) | (yellow_mask == 255))] = 255
+    combined_binary[(combined_binary == 255)] = 1
+    return combined_binary

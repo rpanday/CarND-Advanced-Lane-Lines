@@ -26,6 +26,7 @@ def calibrate_camera(calibrate_img_paths, nx, ny, outDir = None):
     for idx, fname in enumerate(calibrate_img_paths):
 #         print(idx)
         img = cv2.imread(fname)
+        copy = np.copy(img)
         if img_size == None:
             img_size = (img.shape[1], img.shape[0])
         #convert to grayscale
@@ -41,8 +42,8 @@ def calibrate_camera(calibrate_img_paths, nx, ny, outDir = None):
             if outDir != None:
                 write_name = '{}/calibration_corners{}.jpg'.format(outDir, str(idx+1))
                 save_image(write_name, img)
-                if(idx < 2):
-                    show_images(img, None, write_name) #display some samples
+            if(idx < 2):
+                show_images(copy, img) #display some samples
         
     # Do camera calibration given object points and image points
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size,None,None)
@@ -61,20 +62,20 @@ def undistort(mtx, dist, raw_image_paths, outDir = None):
                 
 def perspective_transform(img):
     '''img is undistorted image'''
-    img_size = img.shape[1::-1]
     src = np.float32([
-        [500,500],
-        [800,500],
-        [1100,680],
-        [220, 650],
+        [590,446],
+        [690,446],
+        [1130,670],
+        [150, 670],
     ])
     
-    offsetx = 250
+    offsetx = 200
     offsety = 0
     img_size = (img.shape[1], img.shape[0])
     dst = np.float32([[offsetx, offsety], [img_size[0]-offsetx, offsety], 
                                      [img_size[0]-offsetx, img_size[1]-offsety], 
                                      [offsetx, img_size[1]-offsety]])
+    
     M = cv2.getPerspectiveTransform(src, dst)
     M_inv = cv2.getPerspectiveTransform(dst, src) #inverse transform
     warped = cv2.warpPerspective(img, M, img_size)

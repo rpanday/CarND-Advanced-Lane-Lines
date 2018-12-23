@@ -44,10 +44,10 @@ def find_lane_pixels(binary_warped, nwindows, margin, minpix):
         win_xright_low = rightx_current-margin  # Update this
         win_xright_high = rightx_current+margin  # Update this
         
-        print((win_xleft_low,win_y_low),
-        (win_xleft_high,win_y_high))
-        print((win_xright_low,win_y_low),
-        (win_xright_high,win_y_high))
+#         print((win_xleft_low,win_y_low),
+#         (win_xleft_high,win_y_high))
+#         print((win_xright_low,win_y_low),
+#         (win_xright_high,win_y_high))
         
         # Draw the windows on the visualization image
         cv2.rectangle(out_img,(win_xleft_low,win_y_low),
@@ -115,7 +115,7 @@ def fit_poly(img_shape, leftx, lefty, rightx, righty):
         left_fitx = 1*ploty**2 + 1*ploty
         right_fitx = 1*ploty**2 + 1*ploty
     
-    return left_fitx, right_fitx, ploty
+    return left_fit, right_fit, left_fitx, right_fitx, ploty
 
 def draw_region_lines(out_img, leftx, lefty, rightx, righty, left_fitx, right_fitx, ploty):
     ## Visualization ##
@@ -124,8 +124,8 @@ def draw_region_lines(out_img, leftx, lefty, rightx, righty, left_fitx, right_fi
     out_img[righty, rightx] = [0, 0, 255]
 
     # Plots the left and right polynomials on the lane lines
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
+#     plt.plot(left_fitx, ploty, color='yellow')
+#     plt.plot(right_fitx, ploty, color='yellow')
 
     return out_img
 
@@ -155,6 +155,26 @@ def find_lane_pixels_with_prev_fit(binary_warped, left_fit, right_fit, margin):
     
     return leftx, lefty, rightx, righty
 
+def find_lane_pixels_with_prev_fit2(undistorted_image, binary_warped, left_fit, right_fit, Minv):
+    ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
+    left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
+    right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+    warp_zero = np.zeros_like(binary_warped).astype(np.uint8)
+    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+
+    # Draw the lane onto the warped blank image
+    cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+    newwarp = cv2.warpPerspective(color_warp, Minv, (undistorted_image.shape[1], undistorted_image.shape[0])) 
+
+    # Combine the result with the original image
+    result = cv2.addWeighted(undistorted_image, 1, newwarp, 0.3, 0)
+    return result
+
 def draw_green_region_around_lines(out_img, left_fitx, right_fitx, ploty, margin):
     window_img = np.zeros_like(out_img)
     
@@ -176,3 +196,37 @@ def draw_green_region_around_lines(out_img, left_fitx, right_fitx, ploty, margin
     result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
     
     return result
+
+def fill_green_detected_path(img, binary_warped, left_fit, right_fit):
+    ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
+    left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
+    right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+    warp_zero = np.zeros_like(binary_warped).astype(np.uint8)
+    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+    # Recast the x and y points into usable format for cv2.fillPoly()
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+
+    # Draw the lane onto the warped blank image
+    cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+    invwarp = cv2.warpPerspective(color_warp, Minv, (img.shape[1], img.shape[0])) 
+
+    # Combine the result with the original image
+    result = cv2.addWeighted(img, 1, invwarp, 0.3, 0)
+
+#     ## Add Radius of Curvature
+#     cv2.putText(result,'Radius of Curvature: %.2fm' % line.curvature,(20,40), cv2.FONT_HERSHEY_SIMPLEX, 1,(255,255,255),2)
+
+#     ## Add distance from center
+#     position_from_center = line.get_position_from_center()
+#     if position_from_center < 0:
+#         text = 'left'
+#     else:
+#         text = 'right'
+#     cv2.putText(result,'Distance From Center: %.2fm %s' % (np.absolute(position_from_center), text),(20,80), cv2.FONT_HERSHEY_SIMPLEX, 1,(255,255,255),2)
+
+    return result
+

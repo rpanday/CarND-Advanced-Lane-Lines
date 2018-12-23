@@ -39,3 +39,4 @@ def show_images(img1, img2=None, title1='before', title2='after', fontsize=30):
     
     plt.show()
     
+    
