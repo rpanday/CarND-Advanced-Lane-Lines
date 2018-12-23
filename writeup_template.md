@@ -44,7 +44,7 @@ The code for camera calibration is in file `camera.py` under `utils/` folder. I 
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one. Excuse the wonky colors because my show images was confused between gray and colored but the flattening can be seen in the car to the right.
 ![alt text][image2]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
